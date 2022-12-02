@@ -65,15 +65,24 @@ int main(int argc, char *argv[])
 			{
 				check = ft_check(x_center, y_center, (float)x_index, (float)y_index, radius);
 				if (x_index == width - 1)
+				{
+					//write(1, "\n", 1);
 					result[y_index * x_index] = '\n';
+				}
 				else if (check == 2 || (check == 1 && id == 'C'))
+				{
+					//write(1, &fill, 1);
 					result[y_index * x_index] = fill;
+				}
 				else
+				{
+					//write(1, &background, 1);
 					result[y_index * x_index] = background;
+				}
 			}
 		}
 	}
-	write(1, result, ft_strlen(result));
+	//write(1, result, ft_strlen(result));
 	free(result);
 	fclose(file);
 	return (0);
