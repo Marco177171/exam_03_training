@@ -32,13 +32,23 @@ int ft_check(float x_center, float y_center, float x_index, float y_index, float
 	return (0); // background
 }
 
+void ft_free_matrix(char **matrix)
+{
+	int index;
+
+	index = -1;
+	while (matrix[++index])
+		free(matrix[index]);
+	free(matrix);
+}
+
 int main(int argc, char *argv[])
 {
 	FILE *file;
 	int height, width, x_index, y_index, check;
 	char fill, background, id;
 	float x_center, y_center, radius;
-	char *result;
+	char **result;
 
 	if (argc != 2)
 		return (ft_error("Error: argument\n"));
@@ -49,41 +59,43 @@ int main(int argc, char *argv[])
 		return (ft_error("Error: Operation file corrupted\n"));
 	if (width < 1 || width > 300 || height < 1 || height > 300)
 		return (ft_error("Error: Operation file corrupted\n"));
-	result = malloc(sizeof(char) * width * height + height);
+	result = malloc(sizeof(char*) * height);
+	y_index = -1;
+	while (result[++y_index])
+	{
+		result[y_index] = malloc(sizeof(char) * width);
+		memset(result[y_index], background, width);
+		result[y_index][width] = '\0';
+	}
+	result[height] = NULL;
 	if (!result)
 		return (ft_error("Error: Operation file corrupted\n"));
-	result[width * height + height] = '\0';
 	while (fscanf(file, "%c %f %f %f %c\n", &id, &x_center, &y_center, &radius, &fill) == 5)
 	{
 		if (radius < 0.000000000)
-			return (ft_error("Error: operation file corrupted"));
+			return (ft_error("Error: Operation file corrupted"));
 		y_index = -1;
 		while (++y_index < height)
 		{
+			printf("here\n");
 			x_index = -1;
 			while (++x_index < width)
 			{
 				check = ft_check(x_center, y_center, (float)x_index, (float)y_index, radius);
 				if (x_index == width - 1)
-				{
-					//write(1, "\n", 1);
-					result[y_index * x_index] = '\n';
-				}
+					result[y_index][x_index] = '\0';
 				else if (check == 2 || (check == 1 && id == 'C'))
-				{
-					//write(1, &fill, 1);
-					result[y_index * x_index] = fill;
-				}
-				else
-				{
-					//write(1, &background, 1);
-					result[y_index * x_index] = background;
-				}
+					result[y_index][x_index] = fill;
 			}
 		}
 	}
-	//write(1, result, ft_strlen(result));
-	free(result);
+	y_index = -1;
+	while (++y_index < height)
+	{
+		write(1, result[y_index], ft_strlen(result[y_index]));
+		write(1, "\n", 1);
+	}
+	ft_free_matrix(result);
 	fclose(file);
 	return (0);
 }
