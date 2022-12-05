@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	while (fscanf(file, "%c %f %f %f %c\n", &id, &x_center, &y_center, &radius, &fill) == 5)
 	{
 		if (radius < 0.000000000 || (id != 'c' && id != 'C'))
-			return (ft_error("Error: Operation file corrupted"));
+			return (ft_error("Error: Operation file corrupted\n"));
 		y_index = -1;
 		while (++y_index < height + 1)
 		{
