@@ -59,15 +59,15 @@ int main(int argc, char *argv[])
 		return (ft_error("Error: Operation file corrupted\n"));
 	if (width < 1 || width > 300 || height < 1 || height > 300)
 		return (ft_error("Error: Operation file corrupted\n"));
-	result = malloc(sizeof(char*) * height + 1);
+	result = malloc(sizeof(char*) * height);
 	y_index = -1;
-	while (++y_index < height + 1)
+	while (++y_index < height)
 	{
-		result[y_index] = malloc(sizeof(char) * width + 1);
-		memset(result[y_index], background, width + 1);
-		result[y_index][width + 1] = '\0';
+		result[y_index] = malloc(sizeof(char) * width);
+		memset(result[y_index], background, width);
+		result[y_index][width] = '\0';
 	}
-	result[height + 1] = NULL;
+	result[height] = NULL;
 	if (!result)
 		return (ft_error("Error: Operation file corrupted\n"));
 	while (fscanf(file, "%c %f %f %f %c\n", &id, &x_center, &y_center, &radius, &fill) == 5)
@@ -75,10 +75,10 @@ int main(int argc, char *argv[])
 		if (radius < 0.000000000 || (id != 'c' && id != 'C'))
 			return (ft_error("Error: Operation file corrupted\n"));
 		y_index = -1;
-		while (++y_index < height + 1)
+		while (++y_index < height)
 		{
 			x_index = -1;
-			while (++x_index < width + 1)
+			while (++x_index < width)
 			{
 				check = ft_check(x_center, y_center, (float)x_index, (float)y_index, radius);
 				if (check == 2 || (check == 1 && id == 'C'))
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	y_index = -1;
-	while (++y_index < height + 1)
+	while (++y_index < height)
 	{
 		write(1, result[y_index], ft_strlen(result[y_index]));
 		write(1, "\n", 1);
