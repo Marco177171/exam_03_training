@@ -1,8 +1,12 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <math.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+#define ERR1 "Error: argument\n"
+#define ERR2 "Error: Operation file corrupted\n"
 
 int ft_strlen(char *str)
 {
@@ -20,46 +24,39 @@ int ft_error(char *str)
 	return (1);
 }
 
-int ft_check(float x_center, float y_center, float x_index, float y_index, float radius)
+int ft_check(float x, float y, float radius, float x_index, float y_index)
 {
 	float distance;
 
-	distance = sqrtf(powf(x_center - x_index, 2.) + powf(y_center - y_index, 2.));
-	if ((int)distance < (int)radius)
-		return (1); // inner pixel
-	else if ((int)distance == (int)radius)
-		return (2); // outline;
-	return (0); // background
-}
-
-void ft_free_matrix(char **matrix)
-{
-	int index;
-
-	index = -1;
-	while (matrix[++index])
-		free(matrix[index]);
-	free(matrix);
+	distance = sqrtf(powf(x_index - x, 2.) + powf(y_index - y, 2.));
+	if (distance - radius <= 0.00000000 && distance - radius > -1.00000000)
+		return (1); // outline
+	if (distance - radius <= -1.00000000)
+		return (2);
+	return (0);
 }
 
 int main(int argc, char *argv[])
 {
 	FILE *file;
-	int height, width, x_index, y_index, check;
-	char fill, background, id;
-	float x_center, y_center, radius;
+	int width, height, y_index, x_index;
+	float radius, x, y;
+	char background, fill, id;
 	char **result;
 
 	if (argc != 2)
-		return (ft_error("Error: argument\n"));
+		return (ft_error(ERR1));
 	file = fopen(argv[1], "r");
 	if (!file)
-		return (ft_error("Error: Operation file corrupted\n"));
-	if (fscanf(file, "%c %d %d\n", &background, &width, &height) != 3)
-		return (ft_error("Error: Operation file corrupted\n"));
+		return (ft_error(ERR2));
+	if (fscanf(file, "%d %d %c\n", &width, &height, &background) != 3)
+		return (ft_error(ERR2));
 	if (width < 1 || width > 300 || height < 1 || height > 300)
-		return (ft_error("Error: Operation file corrupted\n"));
-	result = malloc(sizeof(char*) * height);
+		return (ft_error(ERR2));
+	result = malloc(sizeof(char *) * height);
+	result[height] = NULL;
+	if (!result)
+		return (ft_error(ERR2));
 	y_index = -1;
 	while (++y_index < height)
 	{
@@ -67,21 +64,19 @@ int main(int argc, char *argv[])
 		memset(result[y_index], background, width);
 		result[y_index][width] = '\0';
 	}
-	result[height] = NULL;
-	if (!result)
-		return (ft_error("Error: Operation file corrupted\n"));
-	while (fscanf(file, "%c %f %f %f %c\n", &id, &x_center, &y_center, &radius, &fill) == 5)
+	while (fscanf(file, "%c %f %f %f %c\n", &id, &x, &y, &radius, &fill) == 5)
 	{
-		if (radius < 0.000000000 || (id != 'c' && id != 'C'))
-			return (ft_error("Error: Operation file corrupted\n"));
+		if (radius <= 0.00000000 || (id != 'c' && id != 'C'))
+			return (ft_error(ERR2));
 		y_index = -1;
 		while (++y_index < height)
 		{
 			x_index = -1;
 			while (++x_index < width)
 			{
-				check = ft_check(x_center, y_center, (float)x_index, (float)y_index, radius);
-				if (check == 2 || (check == 1 && id == 'C'))
+				if (ft_check(x, y, radius, (float)x_index, (float)y_index) == 1
+						|| (ft_check(x, y, radius, (float)x_index, (float)y_index) == 2
+						&& id == 'C'))
 					result[y_index][x_index] = fill;
 			}
 		}
@@ -92,7 +87,6 @@ int main(int argc, char *argv[])
 		write(1, result[y_index], ft_strlen(result[y_index]));
 		write(1, "\n", 1);
 	}
-	//ft_free_matrix(result);
 	fclose(file);
 	return (0);
 }
