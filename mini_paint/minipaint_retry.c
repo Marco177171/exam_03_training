@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 	file = fopen(argv[1], "r");
 	if (!file)
 		return (ft_error(ERR2));
-	if (fscanf(file, "%d %d %c\n", &width, &height, &background) != 3)
+	if (fscanf(file, "%c %d %d\n", &background, &width, &height) != 3)
 		return (ft_error(ERR2));
 	if (width < 1 || width > 300 || height < 1 || height > 300)
 		return (ft_error(ERR2));
