@@ -35,15 +35,13 @@ void ft_free_matrix(char **matrix)
 	free(matrix);
 }
 
-int ft_check(int x, int y, int r_height, int r_base, int y_index, int x_index)
+int ft_check(float x, float y, float r_height, float r_base, float y_index, float x_index)
 {
-	printf("checking\n");
-	if (x_index > x && x_index < x + r_base && y_index > y && y_index < y + r_height)
-		return (1); // inner pixel
-	else if ((x_index == x || x_index == x + r_base) && (y_index > y && y_index < y + r_height))
-		return (2); // vertical border
-	else if ((x_index > x && x_index < x + r_base) && (y_index == y || y_index == y + r_height))
-		return (3); // horizontal border
+	if (x_index - x < 1.00000000 && x_index - x + r_base < 1.00000000
+			&& y_index - y < 1.00000000 && y_index - y + r_height < 1.00000000)
+		return (1); // outline
+	else if (x_index > (int)x && x_index < (int)x + (int)r_base && y_index > (int)y && y_index < (int)y + (int)r_height)
+		return (2); // border
 	return (0);
 }
 
@@ -69,7 +67,7 @@ int main(int argc, char *argv[])
 	if (!result)
 		return (ft_error(ERR1));
 	y_index = -1;
-	while (result[++y_index])
+	while (++y_index < height)
 	{
 		result[y_index] = malloc(sizeof(char) * width);
 		memset(result[y_index], background, width);
@@ -77,20 +75,16 @@ int main(int argc, char *argv[])
 	}
 	while (fscanf(file, "%c %f %f %f %f %c\n", &id, &x, &y, &r_base, &r_height, &fill) == 6)
 	{
-		printf("here\n");
-		if (r_base <= 0.00000000 || r_height <= 0.00000000)
+		if (r_base <= 0.00000000 || r_height <= 0.00000000 || (id != 'r' && id != 'R'))
 			return (ft_error(ERR1));
 		y_index = -1;
 		while (++y_index < height)
 		{
-			printf("cycling, y = %d\n", y_index);
 			x_index = -1;
 			while (++x_index < width)
 			{
-				printf("x = %d | width = %d\n", x_index, width);
-				if (ft_check((int)x, (int)y, (int)r_height, (int)r_base, y_index, x_index) == 2
-						|| ft_check((int)x, (int)y, (int)r_height, (int)r_base, y_index, x_index) == 3
-						|| (ft_check((int)x, (int)y, (int)r_height, (int)r_base, y_index, x_index) == 1
+				if (ft_check(x, y, r_height, r_base, (float)y_index, (float)x_index) == 1
+						|| (ft_check(x, y, r_height, r_base, (float)y_index, (float)x_index) == 2
 							&& id == 'R'))
 					result[y_index][x_index] = fill;
 			}
@@ -102,7 +96,7 @@ int main(int argc, char *argv[])
 		write(1, result[y_index], ft_strlen(result[y_index]));
 		write(1, "\n", 1);
 	}
-	ft_free_matrix(result);
+	//ft_free_matrix(result);
 	fclose(file);
 	return (0);
 }
