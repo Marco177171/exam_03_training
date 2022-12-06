@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 		write(1, result[y_index], ft_strlen(result[y_index]));
 		write(1, "\n", 1);
 	}
-	ft_free_matrix(result);
+	//ft_free_matrix(result);
 	fclose(file);
 	return (0);
 }
